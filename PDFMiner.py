@@ -23,6 +23,7 @@ def convert_pdf_to_txt(path):
     retstr = StringIO()
     codec = 'utf-8'
     laparams = LAParams()
+    setattr(laparams, 'all_texts', True)
     device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
     fp = open(path, 'rb')
     interpreter = PDFPageInterpreter(rsrcmgr, device)
@@ -89,124 +90,128 @@ def Division(strings):
     return divided
 
 
-# # Actual Code ran proccessing ("Test.pdf")
+# ## Random Symbol Cleaning 
 
-# In[27]:
-
-
-#PDF to test
-PDF = "Test2.pdf"
-
-orgText = convert_pdf_to_txt(PDF)
-text = orgText.replace("\n", " ")
+# In[5]:
 
 
-# In[16]:
+def symbolClean(text):
+    #Cleaned up super random symbols
+    uselessPatterns = ['""',"‘‘", "-'", ",‘", "--", "-‘","--'',","',",",,", ',-']
+    for i in uselessPatterns:
+        cleanedtext = text.replace(i, "")
+    spaced = cleanedtext.split()
+    spaced = ' '.join(spaced)
+    return spaced
 
 
-#Testing Lemmatization
-#Not sure if it really worked
-from nltk.stem import WordNetLemmatizer
-Text = []
-stemmer = WordNetLemmatizer()
+# ## Lemmatization
 
-text = text.split()
-
-text = [stemmer.lemmatize(word) for word in text]
-text = ' '.join(text)
-# Text.append(text)
+# In[6]:
 
 
-# In[32]:
+def lemmatization(text): 
+    ##Testing Lemmatization
+    #Not sure if it really worked
+    from nltk.stem import WordNetLemmatizer
+    stemmer = WordNetLemmatizer()
+
+    text = text.split()
+
+    lemmatizedtext = [stemmer.lemmatize(word) for word in text]
+    lemmatizedtext = ' '.join(text)
+    # Text.append(text)
+    return lemmatizedtext
 
 
-#Cleaned up super random symbols
-uselessPatterns = ['""',"‘‘", "-'", ",‘", "--", "-‘","--'',","',",",,", ',-']
-for i in uselessPatterns:
-    cleanedtext = text.replace(i, "")
-spaced = cleanedtext.split()
-spaced = ' '.join(spaced)
-spaced
+# ## Useless short portions of text removal
+
+# In[7]:
 
 
-# In[26]:
+def shortparaRemove(text):
+    #Remove Useless short sentences less than 200 character??
+    for sentence in text:
+        if len(sentence) > 200:
+            text.remove(sentence)
+    return text
 
 
-#Splits sentences into seperate strings
-cleaned2text = re.split(r'(?<=\.)[ \n]', cleanedtext)
-cleaned2text
-
-
-# In[24]:
-
-
-#Remove Useless short sentences less than 200 character??
-for sentence in cleaned2text:
-    if len(sentence) > 200:
-        cleaned2text.remove(sentence)
-
-
-# ## Section covers categorization of strings
-
-# In[18]:
-
-
-Categorized = categorize_strings(cleaned2text)
-
-
-# ## Testing division
-
-# In[11]:
-
-
-divided = Division(cleaned2text)
-
-
-# ## Compiles info together for export
-
-# In[12]:
-
-
-end_text = []
-for string in cleaned2text:
-    stringy = {'Text': string}
-    end_text.append(stringy)
-#okay this is the long way, not sure how 
-#I want to do it better but there is a way
-finished = []
-
-for index in range(len(cleaned2text)):
-    element = {}
-    
-    if isinstance(end_text[index], dict):
-        element.update(end_text[index])
-        
-    if isinstance(Categorized[index], dict):
-        element.update(Categorized[index])
-        
-    if isinstance(divided[index], dict):
-        element.update(divided[index])
-    
-    finished.append(element)
-
-
-# ## Creates Excel document using Pandas and exports to desktop labeled "PDFtoExcel.xlsx"
+# ## Compiler
 
 # In[13]:
 
 
-Excel = pd.DataFrame(finished)
+def compile(CleanText, Categories, Sections):
+    end_text = []
+    for string in CleanText:
+        stringy = {'Text': string}
+        end_text.append(stringy)
+    #okay this is the long way, not sure how 
+    #I want to do it better but there is a way
+    finished = []
+
+    for index in range(len(CleanText)):
+        element = {}
+
+        if isinstance(end_text[index], dict):
+            element.update(end_text[index])
+
+        if isinstance(Categories[index], dict):
+            element.update(Categories[index])
+
+        if isinstance(Sections[index], dict):
+            element.update(Sections[index])
+
+        finished.append(element)
+    return finished
 
 
-# In[14]:
+# ## Creates Excel document using Pandas and exports to desktop labeled "PDFtoExcel.xlsx"
+
+# In[34]:
 
 
-pd.DataFrame.to_excel(Excel, r"C:\Users\Ben\Desktop\PDF_Testing\PDFtoExcel.xlsx")
+import os
+
+def toExcel(table, fileName):
+    output_dir = r'C:\Users\Ben\Desktop\PDF_Testing'
+    output_path = os.path.join(output_dir, f'{fileName}.xlsx')
+    
+    Excel = pd.DataFrame(table)
+    pd.DataFrame.to_excel(Excel, output_path)
+    
+    return
+
+
+# # Actual Code ran proccessing ("Test.pdf")
+
+# In[35]:
+
+
+#PDF to test
+PDF = "Test4.pdf"
+
+#orgText = convert_pdf_to_txt(PDF)
+text = orgText.replace("\n", " ")
+cleantext0 = symbolClean(text)
+cleantext1 = lemmatization(cleantext0)
+#Splits sentences into seperate strings
+split = re.split(r'(?<=\.)[ \n]', cleantext1)
+cleantext2 = shortparaRemove(split)
+## Section covers categorization of strings
+categories = categorize_strings(cleantext2)
+## Section division
+sections = Division(cleantext2)
+#Creating the list for excel upload
+table = compile(cleantext2, categories, sections)
+#Sending table to Excel
+toExcel(table, 'work')
 
 
 # ## Testing
 
-# In[36]:
+# In[ ]:
 
 
 import re
