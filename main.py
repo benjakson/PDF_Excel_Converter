@@ -9,55 +9,49 @@ import time
 import threading
 import os
 from tkinter import Tk, Button, Label, Entry, filedialog, Checkbutton, IntVar
-#Main/What happens after convert is hit
+
+
+#General Header formats to look at in documents
 header1 = r'^\d+\.\d+' #number.number format for header
 
 
-
+#Main/What happens after convert is hit
 def process_file():
-    input_file_path = file_path_entry.get()
-    output_file_path = output_location_entry.get()
+    input_file_path = file_path_entry.get() #Gathers the file input location
+    output_file_path = output_location_entry.get() #Gathers the file output location
     # custom_text = custom_text_entry.get()
-    header1Bool = header1_var.get()
+    header1Bool = header1_var.get() #Gathers the boolean on header format 1
 
-    if header1Bool == True:
-        headerpattern = r'^\d+\.\d+'
+    if header1Bool == True: #sets the header pattern to header 1 if box is ticked
+        headerpattern = header1
 
 
-        #PDF to test
-    PDF = input_file_path
-    orgText = "That's not a file worth doing this in. Sorry you waited patiently though."
-    orgText = convert_pdf_to_txt(PDF)
-    text = orgText.replace("\n", " ")
-        #Tons of random symbols like ';._' that need to be removed for a cleaner loo
-    cleantext0 = symbolClean(text)
-        #Makes words simpiler, not sure if helpful but useful for ML later
-        #cleantext1 = lemmatization(cleantext0)
-        #Splits sentences into seperate strings
-    split = re.split(r'(?<=\.)[ \n]', cleantext0)
-    cleantext2 = shortparaRemove(split)
-        ## Section covers categorization of strings
-    categories = categorize_strings(cleantext2)
-        ## Section division
-    sections = Division(cleantext2, headerpattern)
-        #creates Source name
-    source = sourceName(PDF)
-        #Creating the list for excel upload
-    table = compile(source, cleantext2, categories, sections, orgText, cleantext0, cleantext2)
-        #Sending table to Excel
-    toExcel(table, output_file_path)
+###MAIN###
+
+    PDF = input_file_path #path to PDF for conversion
+    orgText = convert_pdf_to_txt(PDF) #converts the pdf to text
+    text = orgText.replace("\n", " ") #replaces newlines with spaces
+    cleantext0 = symbolClean(text) #removes extra nonsense symbols
+    #cleantext1 = lemmatization(cleantext0) #makes text into simple words, lemmatizes it
+    split = re.split(r'(?<=\.)[ \n]', cleantext0) #splits string into list by sentences
+    cleantext2 = shortparaRemove(split) #removes short paragraphs that have no use or are pointless
+    categories = categorize_strings(cleantext2) #categorize the text
+    sections = Division(cleantext2, headerpattern) #labels text w/ the sections they correspond to
+    source = sourceName(PDF) #creates source name 
+    table = compile(source, cleantext2, categories, sections, orgText, cleantext0, cleantext2) #takes all the previous data and puts it into a 2D list for export
+    toExcel(table, output_file_path) #sends 2D list to excel
     print('done')
 
-    window.after(0, update_gui)
+    window.after(0, update_gui) #uses seperate cpu core and closes program when finished
 
 
 # ### PDF converter function definition
 
 
 def convert_pdf_to_txt(path):
-    rsrcmgr = PDFResourceManager()
-    retstr = StringIO()
-    codec = 'utf-8'
+    rsrcmgr = PDFResourceManager() #sets resource manager
+    retstr = StringIO() #sets retstr
+    codec = 'utf-8' #sets the processing codec
     laparams = LAParams()
     setattr(laparams, 'all_texts', True)
     device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
