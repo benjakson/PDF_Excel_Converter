@@ -30,4 +30,4 @@ This PDF to Excel conversion tool has been specifically tailored for the require
 
 **Note:** As mentioned earlier, the actual source code for this project is not publicly available in this GitHub repository. For inquiries or more information about the tool, please reach out to the Kiewit team.
 
-For more information about Kiewit and our projects, visit our [website](https://www.kiewit.com/).
+For more information about Kiewit, visit their [website](https://www.kiewit.com/).
