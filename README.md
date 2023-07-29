@@ -35,5 +35,3 @@ This PDF to Excel conversion tool has been specifically tailored for the require
 For more information about Kiewit, visit their [website](https://www.kiewit.com/).
 
 
-https://github.com/benjakson/PDF_Excel_Converter/assets/124751174/f79919d6-9fa9-4390-bba9-b786dc9fd8f9
-
