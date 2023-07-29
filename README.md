@@ -4,6 +4,8 @@ This project aims to develop a PDF to Excel conversion tool for requirements man
 
 **Note:** The source code for this project is internal to Kiewit and is not included in this repository due to company policies.
 
+![PDFExcelerator PHoto](https://github.com/benjakson/PDF_Excel_Converter/assets/124751174/4b3ca05d-b2c5-4e10-8711-0be5e4312a26)
+
 ## Features
 
 - Conversion of PDF to Excel: The tool takes a PDF file as input and converts it into an Excel file. Each chunk of text in the PDF is divided into separate rows in the Excel sheet for easy organization and analysis.
@@ -31,3 +33,7 @@ This PDF to Excel conversion tool has been specifically tailored for the require
 **Note:** As mentioned earlier, the actual source code for this project is not publicly available in this GitHub repository. For inquiries or more information about the tool, please reach out to the Kiewit team.
 
 For more information about Kiewit, visit their [website](https://www.kiewit.com/).
+
+
+https://github.com/benjakson/PDF_Excel_Converter/assets/124751174/f79919d6-9fa9-4390-bba9-b786dc9fd8f9
+
